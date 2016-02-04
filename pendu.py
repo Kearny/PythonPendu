@@ -60,3 +60,5 @@ else:
 
     if victoire:
         print("Bravo, vous avez trouvé le mot ! Le mot était \"" + motADeviner + "\"")
+
+input("Veuillez taper sur une touche pour quitter.")
