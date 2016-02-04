@@ -1,7 +1,7 @@
 import os
 
 # On demande à l'utilisateur un mot
-motADeviner = str(input("Veuillez saisir le mot qui devra être deviné par le joueur :"))
+motADeviner = input("Veuillez saisir le mot qui devra être deviné par le joueur :")
 longueurMot = len(motADeviner)
 victoire = True
 lettresDejaSaisies = list()
@@ -10,6 +10,10 @@ lettresDejaSaisies = list()
 if longueurMot < 4:
     print("Attention, le mot que vous avez entré est trop cout. La longueur minimale est de 4 caractères")
 else:
+    hardMode = input("Voulez-vous cacher la première et la dernière lettre du mot afin d'augmenter la difficulté ? [o;n]")
+
+    # Si le mot est valide on clear la console pour que le deuxième joueur
+    # ne puisse pas voir le mot à deviner. Fonction sur linux et windows
     os.system('cls' if os.name == 'nt' else 'clear')
 
     premiereLettre = motADeviner[0]
@@ -17,18 +21,37 @@ else:
 
     # Etant donné que la première et la dernière lettre du mot vont être
     # directement lisible la taille du mot à deviner est réduite
-    restantATrouver = longueurMot - 2
+    
+
+    if hardMode != 'o':
+        debut = 1
+        fin = longueurMot - 1
+        restantATrouver = longueurMot - 2
+    else:
+        debut = 0
+        fin = longueurMot
+        restantATrouver = longueurMot
 
     # Création du masque par concaténation
-    motEnCours = premiereLettre
+    if hardMode != 'o':
+        motEnCours = premiereLettre
+    else:
+        motEnCours = '-'
 
     for i in range(1, longueurMot - 1):
         motEnCours += '-'
-    motEnCours += derniereLettre
 
-    mauvaiseReponse = 0
+    if hardMode != 'o':
+        motEnCours += derniereLettre
+    else:
+        motEnCours += '-'
+
+    mauvaisesReponses = 0
     nombreDeChances = 5
-    while restantATrouver != 0 and mauvaiseReponse < nombreDeChances:
+
+    print("Pour trouver ce mot vous avez en tout " + str(nombreDeChances) + " chances.")
+
+    while restantATrouver != 0 and mauvaisesReponses < nombreDeChances:
         lettrePropose = input("Proposez une lettre : " + motEnCours + "\n")
 
         if lettresDejaSaisies.count(lettrePropose) > 0:
@@ -40,8 +63,8 @@ else:
             Trouve = False
 
             # On cherche la lettrePropose dans le mot
-            for j in range(1, longueurMot - 1):
-                if motADeviner[j] == lettrePropose:
+            for j in range(debut, fin):
+                if motADeviner[j] == lettrePropose:                    
                     print("Bravo, vous avez trouvé une lettre ! \n")
                     lettreTrouvee += 1
                     restantATrouver -= 1
@@ -49,13 +72,13 @@ else:
                     Trouve = True
 
             if not Trouve:
-                mauvaiseReponse += 1
-                chancesRestantes = nombreDeChances - mauvaiseReponse
+                mauvaisesReponses += 1
+                chancesRestantes = nombreDeChances - mauvaisesReponses
 
                 if chancesRestantes > 0:
                     print("Ah, non! Attention il ne vous reste plus que " + str(chancesRestantes) + " chances!\n")
                 else:
-                    print("Vous avez perdu")
+                    print("Vous avez perdu ! Le mot était \"" + motADeviner + "\"")
                     victoire = False
 
     if victoire:
